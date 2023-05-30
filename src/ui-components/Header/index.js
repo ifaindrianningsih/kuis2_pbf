@@ -40,21 +40,7 @@ const Header = ({ toggleSidebarMenu }) => {
               <HiOutlineMenuAlt1 />
             </button>
           </li>
-          <li>
-            <Link href={'/'}>
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link href={'/'}>
-              Users
-            </Link>
-          </li>
-          <li>
-            <Link href={'/'}>
-              Settings
-            </Link>
-          </li>
+          
         </ul>
       </div>
     </section>

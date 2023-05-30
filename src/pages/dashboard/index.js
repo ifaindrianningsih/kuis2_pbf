@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Card from "../../ui-components/Card";
 import Modal from "../../ui-components/Modal";
-import styles from "./Home.module.css";
+import styles from "../obat/style.module.css";
 
 import DoughnutChartExample from "../../components/DoughnutChartExample";
 import HeaderSection from "../../ui-components/HeaderSection";
@@ -34,34 +34,23 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* <HeaderSection
-        heading={"Dashboard"}
-        subHeading={"Welcome to Sistem Peternakan Sapi"}
-      />
-
-      <Section> */}
-        <DataCard
-          label={"Total Sapi"}
-          value={"23"}
-          percentageValue={56.4}
-          inverse={true}
-        />
-        <DataCard
-          label={"Total Pakan"}
-          value={"45"}
-          percentageValue={3.45}
-        />
-        <DataCard
-          label={"Total Obat"}
-          value={"43"}
-          percentageValue={10.89}
-        />
-        <DataCard
-          label={"Total Karyawan"}
-          value={"9"}
-          percentageValue={10.89}
-        />
-      {/* </Section> */}
+      <div className={styles.content}>
+          <main id="main" className={styles.main}>
+            <section className={styles.section}>
+              <div className={styles.row}>
+                <div className={styles["col-lg-12"]}>
+                    <h2>Dashboard</h2>
+                  <div className={styles.card}>
+                    <div className={styles["card-body"]}>
+                      <h5 className={styles["card-title"]}>Welcome to Dashboard </h5>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
 
       
     </>

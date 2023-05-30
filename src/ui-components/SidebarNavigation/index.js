@@ -36,10 +36,7 @@ const SidebarNavigation = ({
 
       <ul className={styles["sidebar-footer"]}>
         {/* <button onClick={toggleSidebarMenu}>close</button> */}
-          <li className={styles["footer-item"]}> 
-            <TbLogout />
-            <span>Logouts</span>
-          </li>
+          
           
       </ul>
     </section>
