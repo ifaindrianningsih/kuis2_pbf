@@ -6,6 +6,7 @@ import { database } from "../../../firebase";
 import styles from "./style.module.css";
 import Card from "../../ui-components/Card";
 import { useRouter } from 'next/router';
+import axios from "axios";
 
 export default function Obat() {
   const [id, setID] = useState(null);
@@ -32,15 +33,31 @@ export default function Obat() {
     })
     .then(() => {
       alert('Apakah anda yakin akan menambahkan data obat?');
-      getData();
-      setJenisObat('');
-      setStatus('');
-      setHarga('');
-      setTotal('');
+      //send data to laravel API
+      axios.post(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/obats`, {
+        jenisObat: jenisObat,
+        status: status,
+        harga: parseInt(harga),
+        total: parseInt(total)
+      })
+      .then((response) => {
+        // Success handling
+        alert('Berhasil Menambahkan Data');
+        getData();
+        setJenisObat('');
+        setStatus('');
+        setHarga('');
+        setTotal('');
+      })
+      .catch((error) => {
+        // Error handling
+        console.error(error);
+        alert('Gagal menambahkan data ke MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to add data');
+      alert('Gagal menambahkan data');
     });
   };
 
@@ -72,31 +89,59 @@ export default function Obat() {
       total: Number(total)
     })
     .then(() => {
-      alert('Apakah anda yakin akan mengupdate data obat?')
-      getData()
-      setJenisObat('')
-      setStatus('')
-      setHarga('')
-      setTotal('')
-      setIsUpdate(false)
+      alert('Apakah anda yakin akan mengedit data obat?');
+      // Update data ke API Laravel
+      axios.put(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/obats/${jenisObat}`, {
+        jenisObat: jenisObat,
+        status: status,
+        harga: parseInt(harga),
+        total: parseInt(total)
+      })
+      .then((response) => {
+        // Handling sukses
+        alert('Berhasil Mengupdate Data');
+        getData();
+        setJenisObat('');
+        setStatus('');
+        setHarga('');
+        setTotal('');
+        setIsUpdate(false);
+      })
+      .catch((error) => {
+        // Handling error
+        console.error(error);
+        alert('Gagal mengupdate data di MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to update data');
+      alert('Gagal mengupdate data');
     });
   }
 
 
-  const deleteDocument = (id) => {
+  const deleteDocument = (id, jenisObat) => {
     let documentToDelete = doc(database, 'obat', id);
     deleteDoc(documentToDelete)
     .then(() => {
-      alert('Apakah anda yakin akan menghapus data obat?')
-      getData()
+      alert('Apakah anda yakin akan menghapus data obat?');
+      // Hapus data dari API Laravel
+      axios
+        .delete(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/obats/${jenisObat}`)
+        .then((response) => {
+          // Handling sukses
+          alert('Berhasil Menghapus Data');
+          getData();
+        })
+        .catch((error) => {
+          // Handling error
+          console.error(error);
+          alert('Gagal menghapus data di MySQL');
+        });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to delete data');
+      alert('Gagal menghapus data');
     });
   }
 
@@ -318,7 +363,7 @@ export default function Obat() {
                                       </button>
                                       <button
                                         className={`${styles.btn} ${styles['btn-sm']} ${styles['btn-danger']} ${styles['btn-icon']}`}
-                                        onClick={() => deleteDocument(data.id)}
+                                        onClick={() => deleteDocument(data.id, data.jenisObat)}
                                       >
                                         <RiDeleteBin2Line />
                                         Hapus

@@ -6,6 +6,7 @@ import { database } from "../../../firebase";
 import styles from "../obat/style.module.css";
 import Card from "../../ui-components/Card";
 import { useRouter } from 'next/router';
+import axios from "axios";
 
 export default function Sapi() {
   const [id, setID] = useState(null);
@@ -31,16 +32,32 @@ export default function Sapi() {
       kondisi: kondisi
     })
     .then(() => {
-      alert('Apakah anda yakin akan menambahkan data Sapi?');
-      getData();
-      setNis('');
-      setJenisSapi('');
-      setJenisKelamin('');
-      setKondisi('');
+      alert('Apakah anda yakin akan menambahkan data sapi?');
+      //send data to laravel API
+      axios.post(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/sapis`, {
+        nis: nis,
+        jenisSapi: jenisSapi,
+        jenisKelamin: jenisKelamin,
+        kondisi: kondisi
+      })
+      .then((response) => {
+        // Success handling
+        alert('Berhasil Menambahkan Data');
+        getData();
+        setNis('');
+        setJenisSapi('');
+        setJenisKelamin('');
+        setKondisi('');
+      })
+      .catch((error) => {
+        // Error handling
+        console.error(error);
+        alert('Gagal menambahkan data ke MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to add data');
+      alert('Gagal menambahkan data');
     });
   };
 
@@ -72,31 +89,59 @@ export default function Sapi() {
       kondisi: kondisi
     })
     .then(() => {
-      alert('Apakah anda yakin akan mengupdate data sapi?')
-      getData()
-      setNis('')
-      setJenisSapi('')
-      setJenisKelamin('')
-      setKondisi('')
-      setIsUpdate(false)
+      alert('Apakah anda yakin akan mengedit data sapi?');
+      // Update data ke API Laravel
+      axios.put(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/sapis/${nis}`, {
+        nis: nis,
+        jenisSapi: jenisSapi,
+        jenisKelamin: jenisKelamin,
+        kondisi: kondisi
+      })
+      .then((response) => {
+        // Handling sukses
+        alert('Berhasil Mengupdate Data');
+        getData();
+        setNis('');
+        setJenisSapi('');
+        setJenisKelamin('');
+        setKondisi('');
+        setIsUpdate(false);
+      })
+      .catch((error) => {
+        // Handling error
+        console.error(error);
+        alert('Gagal mengupdate data di MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to update data');
+      alert('Gagal mengupdate data');
     });
   }
 
 
-  const deleteDocument = (id) => {
+  const deleteDocument = (id, nis) => {
     let documentToDelete = doc(database, 'sapi', id);
     deleteDoc(documentToDelete)
     .then(() => {
-      alert('Apakah anda yakin akan menghapus data sapi?')
-      getData()
+      alert('Apakah anda yakin akan menghapus data sapi?');
+      // Hapus data dari API Laravel
+      axios
+        .delete(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/sapis/${nis}`)
+        .then((response) => {
+          // Handling sukses
+          alert('Berhasil Menghapus Data');
+          getData();
+        })
+        .catch((error) => {
+          // Handling error
+          console.error(error);
+          alert('Gagal menghapus data di MySQL');
+        });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to delete data');
+      alert('Gagal menghapus data');
     });
   }
 
@@ -342,7 +387,7 @@ export default function Sapi() {
                                       </button>
                                       <button
                                         className={`${styles.btn} ${styles['btn-sm']} ${styles['btn-danger']} ${styles['btn-icon']}`}
-                                        onClick={() => deleteDocument(data.id)}
+                                        onClick={() => deleteDocument(data.id, data.nis)}
                                       >
                                         <RiDeleteBin2Line />
                                         Hapus

@@ -6,6 +6,7 @@ import { database } from "../../../firebase";
 import styles from "../obat/style.module.css";
 import Card from "../../ui-components/Card";
 import { useRouter } from 'next/router';
+import axios from "axios";
 
 export default function Pakan() {
   const [id, setID] = useState(null);
@@ -26,21 +27,37 @@ export default function Pakan() {
     event.preventDefault();
     addDoc(databaseRef, {
       jenisPakan: jenisPakan,
-      harga: harga,
+      harga: parseInt(harga),
       status: status,
-      total: total
+      total: parseInt(total)
     })
     .then(() => {
-      alert('Apakah anda yakin akan menambahkan data Pakan?');
-      getData();
-      setJenisPakan('');
-      setHarga('');
-      setStatus('');
-      setTotal('');
+      alert('Apakah anda yakin akan menambahkan data pakan?');
+      //send data to laravel API
+      axios.post(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/pakans`, {
+        jenisPakan: jenisPakan,
+        harga: parseInt(harga),
+        status: status,
+        total: parseInt(total)
+      })
+      .then((response) => {
+        // Success handling
+        alert('Berhasil Menambahkan Data');
+        getData();
+        setJenisPakan('');
+        setHarga('');
+        setStatus('');
+        setTotal('');
+      })
+      .catch((error) => {
+        // Error handling
+        console.error(error);
+        alert('Gagal menambahkan data ke MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to add data');
+      alert('Gagal menambahkan data');
     });
   };
 
@@ -67,18 +84,34 @@ export default function Pakan() {
     let fieldToEdit = doc(database, 'pakan', id);
     updateDoc(fieldToEdit, {
       jenisPakan: jenisPakan,
-      harga: harga,
+      harga: Number(harga),
       status: status,
-      total: total
+      total: Number(total)
     })
     .then(() => {
-      alert('Apakah anda yakin akan mengupdate data Pakan?')
-      getData()
-      setJenisPakan('')
-      setHarga('')
-      setStatus('')
-      setTotal('')
-      setIsUpdate(false)
+      alert('Apakah anda yakin akan mengedit data pakan?');
+      // Update data ke API Laravel
+      axios.put(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/pakans/${jenisPakan}`, {
+        jenisPakan: jenisPakan,
+        harga: parseInt(harga),
+        status: status,
+        total: parseInt(total)
+      })
+      .then((response) => {
+        // Handling sukses
+        alert('Berhasil Mengupdate Data');
+        getData();
+        setJenisPakan('');
+        setHarga('');
+        setStatus('');
+        setTotal('');
+        setIsUpdate(false);
+      })
+      .catch((error) => {
+        // Handling error
+        console.error(error);
+        alert('Gagal mengupdate data di MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
@@ -87,12 +120,24 @@ export default function Pakan() {
   }
 
 
-  const deleteDocument = (id) => {
+  const deleteDocument = (id, jenisPakan) => {
     let documentToDelete = doc(database, 'pakan', id);
     deleteDoc(documentToDelete)
     .then(() => {
-      alert('Apakah anda yakin akan menghapus data pakan?')
-      getData()
+      alert('Apakah anda yakin akan menghapus data pakan?');
+      // Hapus data dari API Laravel
+      axios
+        .delete(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/pakans/${jenisPakan}`)
+        .then((response) => {
+          // Handling sukses
+          alert('Berhasil Menghapus Data');
+          getData();
+        })
+        .catch((error) => {
+          // Handling error
+          console.error(error);
+          alert('Gagal menghapus data di MySQL');
+        });
     })
     .catch((err) => {
       console.error(err);
@@ -318,7 +363,7 @@ export default function Pakan() {
                                       </button>
                                       <button
                                         className={`${styles.btn} ${styles['btn-sm']} ${styles['btn-danger']} ${styles['btn-icon']}`}
-                                        onClick={() => deleteDocument(data.id)}
+                                        onClick={() => deleteDocument(data.id, data.jenisPakan)}
                                       >
                                         <RiDeleteBin2Line />
                                         Hapus

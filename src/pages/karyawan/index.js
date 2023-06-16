@@ -6,6 +6,7 @@ import { database } from "../../../firebase";
 import styles from "../obat/style.module.css";
 import Card from "../../ui-components/Card";
 import { useRouter } from 'next/router';
+import axios from "axios";
 
 export default function Karyawan() {
   const [id, setID] = useState(null);
@@ -34,16 +35,33 @@ export default function Karyawan() {
     })
     .then(() => {
       alert('Apakah anda yakin akan menambahkan data karyawan?');
-      getData();
-      setNomorKaryawan('');
-      setNama('');
-      setJenisKelamin('');
-      setJamKerja('');
-      setStatus('');
+      //send data to laravel API
+      axios.post(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/karyawans`, {
+        nomorKaryawan: nomorKaryawan,
+        nama: nama,
+        jenisKelamin: jenisKelamin,
+        jamKerja: parseInt(jamKerja),
+        status: status
+      })
+      .then((response) => {
+        // Success handling
+        alert('Berhasil Menambahkan Data');
+        getData();
+        setNomorKaryawan('');
+        setNama('');
+        setJenisKelamin('');
+        setJamKerja('');
+        setStatus('');
+      })
+      .catch((error) => {
+        // Error handling
+        console.error(error);
+        alert('Gagal menambahkan data ke MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to add data');
+      alert('Gagal menambahkan data');
     });
   };
 
@@ -77,34 +95,63 @@ export default function Karyawan() {
       status: status
     })
     .then(() => {
-      alert('Apakah anda yakin akan mengupdate data karyawan?')
-      getData()
-      setNomorKaryawan('')
-      setNama('')
-      setJenisKelamin('')
-      setJamKerja('')
-      setStatus('')
-      setIsUpdate(false)
+      alert('Apakah anda yakin akan mengedit data karyawan?');
+      // Update data ke API Laravel
+      axios.put(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/karyawans/${nomorKaryawan}`, {
+        nomorKaryawan: nomorKaryawan,
+        nama: nama,
+        jenisKelamin: jenisKelamin,
+        jamKerja: parseInt(jamKerja),
+        status: status
+      })
+      .then((response) => {
+        // Handling sukses
+        alert('Berhasil Mengupdate Data');
+        getData();
+        setNomorKaryawan('');
+        setNama('');
+        setJenisKelamin('');
+        setJamKerja('');
+        setStatus('');
+        setIsUpdate(false);
+      })
+      .catch((error) => {
+        // Handling error
+        console.error(error);
+        alert('Gagal mengupdate data di MySQL');
+      });
     })
     .catch((err) => {
       console.error(err);
-      alert('Failed to update data');
+      alert('Gagal mengupdate data');
     });
   }
 
 
-  const deleteDocument = (id) => {
+  const deleteDocument = (id, nomorKaryawan) => {
     let documentToDelete = doc(database, 'karyawan', id);
     deleteDoc(documentToDelete)
-    .then(() => {
-      alert('Apakah anda yakin akan menghapus data karyawan?')
-      getData()
-    })
-    .catch((err) => {
-      console.error(err);
-      alert('Failed to delete data');
-    });
-  }
+      .then(() => {
+        alert('Apakah anda yakin akan menghapus data karyawan?');
+        // Hapus data dari API Laravel
+        axios
+          .delete(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/karyawans/${nomorKaryawan}`)
+          .then((response) => {
+            // Handling sukses
+            alert('Berhasil Menghapus Data');
+            getData();
+          })
+          .catch((error) => {
+            // Handling error
+            console.error(error);
+            alert('Gagal menghapus data di MySQL');
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+        alert('Gagal Menghapus Data');
+      });
+  };
 
   const resetFormFields = () => {
     setNomorKaryawan('')
@@ -377,7 +424,7 @@ export default function Karyawan() {
                                       </button>
                                       <button
                                         className={`${styles.btn} ${styles['btn-sm']} ${styles['btn-danger']} ${styles['btn-icon']}`}
-                                        onClick={() => deleteDocument(data.id)}
+                                        onClick={() => deleteDocument(data.id, data.nomorKaryawan)}
                                       >
                                         <RiDeleteBin2Line />
                                         Hapus
