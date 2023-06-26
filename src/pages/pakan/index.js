@@ -48,6 +48,9 @@ export default function Pakan() {
         setHarga('');
         setStatus('');
         setTotal('');
+
+        // Redirect to http://localhost:3000/pakan
+        window.location.href = 'http://localhost:3000/pakan';
       })
       .catch((error) => {
         // Error handling

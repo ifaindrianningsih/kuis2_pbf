@@ -52,6 +52,9 @@ export default function Karyawan() {
         setJenisKelamin('');
         setJamKerja('');
         setStatus('');
+
+        // Redirect to http://localhost:3000/karyawan
+        window.location.href = 'http://localhost:3000/karyawan';
       })
       .catch((error) => {
         // Error handling

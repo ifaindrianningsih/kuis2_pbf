@@ -48,6 +48,9 @@ export default function Sapi() {
         setJenisSapi('');
         setJenisKelamin('');
         setKondisi('');
+
+        // Redirect to http://localhost:3000/sapi
+        window.location.href = 'http://localhost:3000/sapi';
       })
       .catch((error) => {
         // Error handling

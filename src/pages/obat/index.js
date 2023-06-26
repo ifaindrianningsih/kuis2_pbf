@@ -48,6 +48,9 @@ export default function Obat() {
         setStatus('');
         setHarga('');
         setTotal('');
+
+        // Redirect to http://localhost:3000/obat
+        window.location.href = 'http://localhost:3000/obat';
       })
       .catch((error) => {
         // Error handling
